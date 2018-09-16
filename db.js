@@ -102,39 +102,52 @@ var block = {
   index: async function() {
     console.log("* Indexing MongoDB...")
     console.time("TotalIndex")
-    if (config.index && config.index.keys) {
-      console.log("Indexing keys...")
-      let keys = config.index.keys;
-      for(let i=0; i<keys.length; i++) {
-        let o = {}
-        o[keys[i]] = 1;
-        console.time("Index:" + keys[i])
-        await db.collection("confirmed").createIndex(o).catch(function(e) {
-          console.log("index " + keys[i] + " already exists")
-        })
-        console.log("* Created index for ", keys[i])
-        console.timeEnd("Index:" + keys[i])
-      }
-    }
-    if (config.index && config.index.fulltext) {
-      console.log("Creating full text index...")
-      let fulltext = {};
-      config.index.fulltext.forEach(function(key) {
-        fulltext[key] = "text";
+
+    if (config.index) {
+      Object.keys(config.index).forEach(function(collectionName) {
+        let keys = config.index[collectionName].keys;
+        let fulltext = config.index[collectionName].fulltext;
+        if (keys) {
+          console.log("Indexing keys...")
+          for(let i=0; i<keys.length; i++) {
+            let o = {}
+            o[keys[i]] = 1;
+            console.time("Index:" + keys[i])
+            try {
+              await db.collection("confirmed").createIndex(o)
+              console.log("* Created index for ", keys[i])
+            } catch (e) {
+              console.log("index " + keys[i] + " already exists")
+            }
+            console.timeEnd("Index:" + keys[i])
+          }
+        }
+        if (fulltext) {
+          console.log("Creating full text index...")
+          let o = {};
+          fulltext.forEach(function(key) {
+            o[key] = "text";
+          })
+          console.time("Fulltext search for " + collectionName)
+          try {
+            await db.collection("confirmed").createIndex(o, { name: "fulltext" })
+          } catch (e) {
+            console.log("text search index for " + collectionName + " already exists")
+          }
+          console.timeEnd("Fulltext search for " + collectionName)
+        }
       })
-      await db.collection("confirmed").createIndex(fulltext, {
-        name: "fulltext"
-      }).catch(function(e) {
-        console.log("text search index already exists")
-      })
     }
+
     console.log("* Finished indexing MongoDB...")
     console.timeEnd("TotalIndex")
 
-    let result = await db.collection("confirmed").indexInformation({full: true}).catch(function(e) {
-      console.log("* Error indexing ", e)
-    })
-    console.log("* Result = ", result)
+    try {
+      let result = await db.collection("confirmed").indexInformation({full: true})
+      console.log("* Result = ", result)
+    } catch (e) {
+      console.log("* Error fetching index info ", e)
+    }
   }
 }
 module.exports = {
