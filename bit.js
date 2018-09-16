@@ -67,9 +67,7 @@ const request = {
   tx: async function(hash) {
     // Only index output for now
     let content = await bton.fromHash(hash)
-    return content.filter(function(c) {
-      return c.type === 'o'
-    })
+    return [].concat(content.inputs).concat(content.outputs)
   },
   mempool: function() {
     return new Promise(function(resolve, reject) {
