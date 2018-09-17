@@ -15,6 +15,17 @@ const daemon = {
 
     // 2. Bootstrap actions depending on first time
     const lastSynchronized = await Info.checkpoint()
+
+/*
+    console.time("Indexing Keys")
+    if (lastSynchronized === Filter.from) {
+      // First time. Try indexing
+      console.log("Indexing...", new Date())
+      await Db.block.index()
+    }
+    console.timeEnd("Indexing Keys")
+    */
+
     if (lastSynchronized !== Filter.from) {
       // Resume
       // Rewind one step and start

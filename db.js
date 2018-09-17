@@ -104,7 +104,9 @@ var block = {
     console.time("TotalIndex")
 
     if (config.index) {
-      Object.keys(config.index).forEach(function(collectionName) {
+      let collectionNames = Object.keys(config.index);
+      for(let j=0; j<collectionNames.length; j++) {
+        let collectionName = collectionNames[j];
         let keys = config.index[collectionName].keys;
         let fulltext = config.index[collectionName].fulltext;
         if (keys) {
@@ -115,7 +117,7 @@ var block = {
             console.time("Index:" + keys[i])
             try {
               console.log(o)
-              await db.collection("confirmed").createIndex(o)
+              await db.collection(collectionName).createIndex(o)
               console.log("* Created index for ", keys[i])
             } catch (e) {
               console.log("index " + keys[i] + " already exists")
@@ -132,13 +134,13 @@ var block = {
           console.time("Fulltext search for " + collectionName)
           try {
             console.log(o)
-            await db.collection("confirmed").createIndex(o, { name: "fulltext" })
+            await db.collection(collectionName).createIndex(o, { name: "fulltext" })
           } catch (e) {
             console.log("text search index for " + collectionName + " already exists")
           }
           console.timeEnd("Fulltext search for " + collectionName)
         }
-      })
+      }
     }
 
     console.log("* Finished indexing MongoDB...")
@@ -146,7 +148,9 @@ var block = {
 
     try {
       let result = await db.collection("confirmed").indexInformation({full: true})
-      console.log("* Result = ", result)
+      console.log("* Confirmed Index = ", result)
+      result = await db.collection("unconfirmed").indexInformation({full: true})
+      console.log("* Unonfirmed Index = ", result)
     } catch (e) {
       console.log("* Error fetching index info ", e)
     }
