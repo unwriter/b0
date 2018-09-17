@@ -114,6 +114,7 @@ var block = {
             o[keys[i]] = 1;
             console.time("Index:" + keys[i])
             try {
+              console.log(o)
               await db.collection("confirmed").createIndex(o)
               console.log("* Created index for ", keys[i])
             } catch (e) {
@@ -130,6 +131,7 @@ var block = {
           })
           console.time("Fulltext search for " + collectionName)
           try {
+            console.log(o)
             await db.collection("confirmed").createIndex(o, { name: "fulltext" })
           } catch (e) {
             console.log("text search index for " + collectionName + " already exists")
