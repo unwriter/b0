@@ -16,7 +16,6 @@ const daemon = {
     // 2. Bootstrap actions depending on first time
     const lastSynchronized = await Info.checkpoint()
 
-/*
     console.time("Indexing Keys")
     if (lastSynchronized === Filter.from) {
       // First time. Try indexing
@@ -24,7 +23,6 @@ const daemon = {
       await Db.block.index()
     }
     console.timeEnd("Indexing Keys")
-    */
 
     if (lastSynchronized !== Filter.from) {
       // Resume
@@ -41,14 +39,6 @@ const daemon = {
     console.time("Initial Sync");
     await Bit.run();
     console.timeEnd("Initial Sync");
-
-    console.time("Indexing Keys")
-    if (lastSynchronized === Filter.from) {
-      // First time. Try indexing
-      console.log("Indexing...", new Date())
-      await Db.block.index()
-    }
-    console.timeEnd("Indexing Keys")
 
     // 4. Start listening
     Bit.listen()

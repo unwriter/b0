@@ -88,7 +88,7 @@ const request = {
             }))
           }
           let xputs = await Promise.all(tasks)
-          console.log("xputs = ", xputs)
+          console.log("xputs = ", xputs.length)
           let tx_contents = []
           for(let i=0; i<xputs.length; i++) {
             tx_contents = tx_contents.concat(xputs[i])
